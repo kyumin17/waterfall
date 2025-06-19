@@ -4,7 +4,8 @@ class Water {
 public:
 	int x;
 	int y;
-	int r;
+	int w;
+	int a;
 
-	Water(int _x, int _y, int _r);
+	Water(int _x, int _y, int _w, int _a);
 };

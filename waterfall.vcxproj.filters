@@ -29,6 +29,7 @@
       <Filter>addons\ofxOpenCv\src</Filter>
     </ClCompile>
     <ClCompile Include="src\water.cpp" />
+    <ClCompile Include="src\utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -2071,8 +2072,12 @@
       <Filter>addons\ofxOpenCv\libs\opencv\include\opencv4\opencv2</Filter>
     </ClInclude>
     <ClInclude Include="src\water.h" />
+    <ClInclude Include="src\utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="icon.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="bin\data\haarcascade_frontalface_default.xml" />
   </ItemGroup>
 </Project>
