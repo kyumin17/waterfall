@@ -4,7 +4,6 @@
 void ofApp::setup(){
 	video.setVerbose(true);
     video.setup(320 * 4, 240 * 4);
-	gray_image.allocate(320 * 4, 240 * 4);
 
 	harrFinder.setup("haarcascade_frontalface_default.xml");
 
@@ -49,22 +48,38 @@ void ofApp::update(){
 
 	pixels.setImageType(OF_IMAGE_GRAYSCALE);
 
-	// ofxCvGrayscaleImage gray_image;
+	ofxCvGrayscaleImage gray_image;
 	gray_image.setFromPixels(pixels);
 
-	contourFinder.findContours(gray_image, 5000, 320 * 4 * 240 * 4 / 2, 5, true);
+	contourFinder.findContours(gray_image, 6000, 320 * 4 * 240 * 4 / 3, 3, false);
+
+	contour.clear();
+
+	for (int i = 0; i < contourFinder.nBlobs; i++) {
+		vector<cv::Point> pts;
+		for (auto j : contourFinder.blobs[i].pts) {
+			pts.push_back(cv::Point(j.x, j.y));
+		}
+
+		contour.push_back(pts);
+	}
+
+	simplifyLine(contour);
 
 	for (int i = 0; i < water_width; i++) {
-		waterfall.push_back(new Water(ofGetWidth() / 2 - offset * water_width / 2 + i * offset, -1 * offset, offset, opacity[i]));
-		waterfall.push_back(new Water(ofGetWidth() / 2 - offset * water_width / 2 + i * offset, -1 * offset / 2, offset, opacity[i]));
+		for (int j = 0; j < 4; j++) {
+			waterfall.push_back(new Water(ofGetWidth() / 2 - offset * water_width / 2 + i * offset, offset * j, offset, opacity[i]));
+		}
 	}
 
 	for (size_t i = 0; i < waterfall.size(); i++) {
-		waterfall[i]->y += offset;
+		waterfall[i]->y += offset * 4;
 
 		if (waterfall[i]->y >= 240 * 4) {
 			waterfall.erase(waterfall.begin() + i);
 		}
+
+		isCollide(contour, waterfall[i]);
 	}
 }
 
@@ -79,13 +94,16 @@ void ofApp::draw(){
 	ofPopMatrix();
 
 	ofSetColor(0, 255, 0);
-	for (int i = 0; i < contourFinder.nBlobs; i++) {
-		contourFinder.blobs[i].draw(0, 0);
+	for (auto points : contour) {
+		for (auto point : points) {
+			ofDrawCircle(point.x, point.y, 4);
+		}
 	}
+
 
 	for (size_t i = 0; i < waterfall.size(); i++) {
 		ofSetColor(230, 230, 255, waterfall[i]->a);
-		// ofDrawRectangle(waterfall[i]->x, waterfall[i]->y, waterfall[i]->w, waterfall[i]->w);
+		ofDrawRectangle(waterfall[i]->x, waterfall[i]->y, waterfall[i]->w, waterfall[i]->w);
 	}
 }
 

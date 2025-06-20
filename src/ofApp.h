@@ -30,9 +30,9 @@ public:
 	ofxCvHaarFinder harrFinder;
 	ofxCvContourFinder contourFinder;
 
-	vector<Water*> waterfall;
+	vector<vector<cv::Point>> contour;
 
-	ofxCvGrayscaleImage gray_image, gray_bg, gray_diff;
+	vector<Water*> waterfall;
 
 	int water_width = 51;
 	int offset = 20;
