@@ -5,6 +5,8 @@ void ofApp::setup(){
 	video.setVerbose(true);
     video.setup(320 * 4, 240 * 4);
 
+	ofSetFrameRate(30);
+
 	harrFinder.setup("haarcascade_frontalface_default.xml");
 
 	mt19937 gen(rd());
@@ -28,24 +30,21 @@ void ofApp::update(){
 	pixels.mirror(false, true);
 
 	// find head
-	harrFinder.findHaarObjects(pixels);
+	// harrFinder.findHaarObjects(pixels);
 
-	ofRectangle head(0, 0, 0, 0);
-	head = harrFinder.blobs.size() > 0 ? harrFinder.blobs[0].boundingRect : head;
+	// ofRectangle head = harrFinder.blobs.size() > 0 ? harrFinder.blobs[0].boundingRect : ofRectangle(0, 0, 0, 0);
 
-	// detect skin color
-	for (int i = 0; i < pixels.getWidth(); i++) {
-		for (int j = 0; j < pixels.getHeight(); j++) {
-			ofColor color = pixels.getColor(i, j);
-			if (!(head.x <= i && i <= head.x + head.width) && isSkinColor(color.r, color.g, color.b)) {
-				pixels.setColor(i, j, ofColor(255));
-			}
-			else {
-				pixels.setColor(i, j, ofColor(0));
-			}
-		}
+	unsigned char* data = pixels.getData();
+
+	for (int i = 0; i < pixels.getWidth() * pixels.getHeight() * 3; i+=3) {
+		unsigned char r = data[i];
+		unsigned char g = data[i + 1];
+		unsigned char b = data[i + 2];
+
+		unsigned char v = isSkinColor(r, g, b) ? 255 : 0;
+		data[i] = data[i + 1] = data[i + 2] = v;
 	}
-
+	
 	pixels.setImageType(OF_IMAGE_GRAYSCALE);
 
 	ofxCvGrayscaleImage gray_image;
@@ -99,7 +98,6 @@ void ofApp::draw(){
 			ofDrawCircle(point.x, point.y, 4);
 		}
 	}
-
 
 	for (size_t i = 0; i < waterfall.size(); i++) {
 		ofSetColor(230, 230, 255, waterfall[i]->a);
